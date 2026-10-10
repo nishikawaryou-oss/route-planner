@@ -11,9 +11,9 @@
   --wait: #7c8a86;        /* 待ち・乗換 */
   --soft: #e5efec;
   --danger: #b3412f;
-  --f-display: "Zen Maru Gothic", "Hiragino Maru Gothic ProN", sans-serif;
-  --f-body: "Zen Kaku Gothic New", "Hiragino Sans", "Yu Gothic", system-ui, sans-serif;
-  --f-mono: "JetBrains Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+  --f-display: "IBM Plex Sans JP", "Hiragino Sans", "Yu Gothic UI", sans-serif;
+  --f-body: "IBM Plex Sans JP", "Hiragino Sans", "Yu Gothic UI", system-ui, sans-serif;
+  --f-mono: "IBM Plex Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
 }
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
@@ -29,9 +29,9 @@
 }
 * { box-sizing: border-box; }
 [hidden] { display: none !important; }
-body { background: var(--bg); color: var(--ink); font-family: var(--f-body); font-size: 15px; line-height: 1.6; }
+body { background: var(--bg); color: var(--ink); font-family: var(--f-body); font-size: 15px; line-height: 1.7; font-feature-settings: "palt"; -webkit-font-smoothing: antialiased; }
 .wrap { max-width: 1120px; margin: 0 auto; padding-inline: 16px; padding-block: 28px 56px; display: grid; gap: 24px; }
-header h1 { font-family: var(--f-display); font-size: 1.75rem; margin: 0; letter-spacing: .02em; text-wrap: balance; }
+header h1 { font-family: var(--f-display); font-size: 1.75rem; font-weight: 700; margin: 0; letter-spacing: -.01em; text-wrap: balance; }
 header p { margin: 4px 0 0; color: var(--muted); max-width: 62ch; }
 .grid { display: grid; grid-template-columns: minmax(0, 380px) minmax(0, 1fr); gap: 24px; align-items: start; }
 @media (max-width: 860px) { .grid { grid-template-columns: minmax(0, 1fr); } }
@@ -73,7 +73,7 @@ button:disabled { opacity: .5; cursor: default; }
 .board { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; overflow: hidden; }
 .board-head { padding: 18px 20px; display: grid; gap: 10px; border-bottom: 1px solid var(--line); }
 .tag { display: inline-block; font-size: .72rem; font-weight: 700; letter-spacing: .08em; padding: 2px 8px; border-radius: 999px; background: var(--soft); color: var(--accent); width: fit-content; }
-.board-head h2 { margin: 0; font-family: var(--f-display); font-size: 1.3rem; text-wrap: balance; }
+.board-head h2 { margin: 0; font-family: var(--f-display); font-weight: 700; font-size: 1.3rem; letter-spacing: -.005em; text-wrap: balance; }
 .board-head p { margin: 0; color: var(--muted); }
 .kpis { display: flex; flex-wrap: wrap; gap: 8px 22px; }
 .kpi { display: grid; }
