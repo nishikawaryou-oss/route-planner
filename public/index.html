@@ -1,0 +1,177 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>行程プランナー</title>
+<meta name="theme-color" content="#0b7a68">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="行程プランナー">
+<link rel="manifest" href="/manifest.webmanifest">
+<link rel="icon" href="/icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="/icon-180.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Zen+Kaku+Gothic+New:wght@400;500;700&family=Zen+Maru+Gothic:wght@700&family=JetBrains+Mono:wght@500;700&display=swap">
+<link rel="stylesheet" href="/style.css">
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>行程プランナー</h1>
+    <p>行きたい場所と時間を普段のことばで書くと、現在地とあなたの移動のくせに合わせて、経路と出発時刻を逆算したタイムスケジュールを作ります。</p>
+  </header>
+
+  <div class="grid">
+    <form class="panel" id="form" autocomplete="off">
+      <div class="here">
+        <button type="button" id="hereBtn"><span class="pin" aria-hidden="true"></span><span id="hereLabel">現在地から出発</span></button>
+        <p class="hint" id="hereHint">押すと位置情報の利用を確認されます。</p>
+      </div>
+
+      <div class="seg" role="radiogroup" aria-label="入力のしかた">
+        <input type="radio" name="imode" id="im-free" value="free" checked><label for="im-free">ことばで頼む</label>
+        <input type="radio" name="imode" id="im-form" value="form"><label for="im-form">項目で入れる</label>
+      </div>
+
+      <div class="field" id="freeBox">
+        <label for="free">どこへ、いつ、どう行きたい？</label>
+        <textarea id="free" rows="5" placeholder="例：11時に長谷寺に着きたい。途中で鶴岡八幡宮に45分くらい寄って、どこかで軽くお昼も食べたい。"></textarea>
+        <p class="hint">日付・時刻・寄り道・食事・荷物の多さなど、思いつくまま書いてください。</p>
+      </div>
+
+      <div id="formBox" class="formbox" hidden>
+        <div class="field">
+          <label for="origin">出発地</label>
+          <input id="origin" placeholder="空欄なら現在地か、いつもの出発地">
+        </div>
+        <div class="field">
+          <label for="dest">行先</label>
+          <input id="dest" placeholder="例：長谷寺（鎌倉）">
+        </div>
+        <div class="field">
+          <span class="lbl">時刻の指定</span>
+          <div class="seg three" role="radiogroup" aria-label="時刻の指定">
+            <input type="radio" name="tmode" id="tm-now" value="now"><label for="tm-now">今すぐ出発</label>
+            <input type="radio" name="tmode" id="tm-arrive" value="arrive" checked><label for="tm-arrive">到着時刻</label>
+            <input type="radio" name="tmode" id="tm-depart" value="depart"><label for="tm-depart">出発時刻</label>
+          </div>
+          <div class="row2" id="whenRow">
+            <input type="date" id="date" aria-label="日付">
+            <input type="time" id="time" aria-label="時刻">
+          </div>
+        </div>
+        <div class="field">
+          <span class="lbl">経由地と滞在時間</span>
+          <div class="wps" id="wps"></div>
+          <button type="button" class="ghost" id="addWp">＋ 経由地を追加</button>
+        </div>
+        <div class="row2">
+          <div class="field">
+            <label for="mode">主な移動手段</label>
+            <select id="mode">
+              <option value="公共交通機関（電車・バス）">電車・バス</option>
+              <option value="車">車</option>
+              <option value="徒歩">徒歩</option>
+              <option value="自転車">自転車</option>
+              <option value="おまかせ（最適なものを選ぶ）">おまかせ</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="buffer">余裕を見る時間</label>
+            <select id="buffer">
+              <option value="0">なし</option>
+              <option value="5">5分</option>
+              <option value="10" selected>10分</option>
+              <option value="15">15分</option>
+              <option value="30">30分</option>
+            </select>
+          </div>
+        </div>
+        <div class="field">
+          <label for="notes">その他の条件</label>
+          <textarea id="notes" placeholder="例：昼食を途中で取りたい／乗換は少なめ／子連れ"></textarea>
+        </div>
+      </div>
+
+      <details class="prof" id="prof">
+        <summary><span>あなたの移動のくせ</span><small id="profSum"></small></summary>
+        <div class="prof-body">
+          <p class="hint">ここの設定は毎回の経路づくりに使われ、この端末に保存されます。</p>
+          <div class="field">
+            <label for="pHome">いつもの出発地（自宅の最寄り駅など）</label>
+            <input id="pHome" placeholder="例：武蔵小杉駅（自宅から徒歩8分）">
+          </div>
+          <div class="row2">
+            <div class="field">
+              <label for="pWalk">歩く速さ</label>
+              <select id="pWalk">
+                <option value="ゆっくり（一般的な所要時間の1.3倍）">ゆっくり</option>
+                <option value="ふつう（一般的な所要時間どおり）" selected>ふつう</option>
+                <option value="速め（一般的な所要時間の0.8倍）">速め</option>
+              </select>
+            </div>
+            <div class="field">
+              <label for="pXfer">乗換に見込む時間</label>
+              <select id="pXfer">
+                <option value="最短でよい">最短でよい</option>
+                <option value="3分以上" selected>3分以上</option>
+                <option value="5分以上">5分以上</option>
+                <option value="10分以上">10分以上</option>
+              </select>
+            </div>
+          </div>
+          <div class="field">
+            <span class="lbl">好きな移動手段</span>
+            <div class="checks" id="pLike">
+              <label><input type="checkbox" value="電車">電車</label>
+              <label><input type="checkbox" value="バス">バス</label>
+              <label><input type="checkbox" value="徒歩">徒歩</label>
+              <label><input type="checkbox" value="自転車・シェアサイクル">自転車</label>
+              <label><input type="checkbox" value="車">車</label>
+              <label><input type="checkbox" value="タクシー">タクシー</label>
+            </div>
+          </div>
+          <div class="field">
+            <span class="lbl">避けたいこと</span>
+            <div class="checks" id="pAvoid">
+              <label><input type="checkbox" value="乗換の多い経路">乗換が多い</label>
+              <label><input type="checkbox" value="長い徒歩（15分超）">長く歩く</label>
+              <label><input type="checkbox" value="階段の多い駅・ルート">階段</label>
+              <label><input type="checkbox" value="混雑する路線・時間帯">混雑</label>
+              <label><input type="checkbox" value="有料特急・追加料金">追加料金</label>
+            </div>
+          </div>
+          <div class="field">
+            <label for="pMore">ほかに知っておいてほしいこと</label>
+            <textarea id="pMore" placeholder="例：家を出るまでに準備で20分かかる／駅では必ずトイレに寄る／坂道は苦手"></textarea>
+          </div>
+          <div class="field">
+            <label for="pass">合言葉</label>
+            <input id="pass" type="password" autocomplete="current-password" placeholder="アプリの設定時に決めたもの">
+          </div>
+        </div>
+      </details>
+
+      <div class="actions">
+        <button type="submit" class="primary" id="go">スケジュールを作る</button>
+        <button type="button" id="stop" hidden>止める</button>
+      </div>
+      <p class="err" id="formErr" hidden></p>
+    </form>
+
+    <section class="result" aria-live="polite">
+      <div class="board" id="board"></div>
+      <div class="panel refine" id="refineBox" hidden>
+        <label for="refine">このスケジュールを直す</label>
+        <div class="rrow">
+          <input id="refine" placeholder="例：八幡宮の滞在を1時間に／帰りの電車も入れて">
+          <button type="button" id="refineGo">直す</button>
+        </div>
+      </div>
+    </section>
+  </div>
+</div>
+<script src="/app.js"></script>
+</body>
+</html>
